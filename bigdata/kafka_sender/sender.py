@@ -22,7 +22,7 @@ import json
 
 from kafka import KafkaProducer
 
-from kafka_sender.faker import Faker
+from bigdata.kafka_sender.faker import Faker
 
 
 class Sender(KafkaProducer):
