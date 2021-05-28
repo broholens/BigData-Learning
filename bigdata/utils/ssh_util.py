@@ -9,19 +9,20 @@ class SSHConnection:
         self._local_connection = None
         self._connections = None
 
+    @property
     def connection(self):
         if not self._local_connection:
-            self._local_connection = Connection(self._localhost)
+            self._local_connection = Connection(self._localhost, user='root', connect_kwargs={'password': ' '})
         return self._local_connection
 
+    @property
     def connections(self):
         if not self._connections:
-            self._connections = SerialGroup(*self.hosts)
+            self._connections = SerialGroup(*self.hosts, user='root', connect_kwargs={'password': ' '})
         return self._connections
 
     def run_cmd_local(self, cmd):
-        return self._local_connection.run(cmd)
+        return self.connection.run(cmd)
 
     def run_cmd_all_nodes(self, cmd):
-        for cnx in self._connections:
-            yield cnx.run(cmd)
+        return self.connections.run(cmd)
