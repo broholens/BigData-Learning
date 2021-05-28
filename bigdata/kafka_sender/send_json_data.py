@@ -19,6 +19,7 @@ The producer is thread safe and sharing a single producer instance across thread
 send() is asynchronous, and u should call flush() to block.
 """
 import json
+import time
 
 from kafka import KafkaProducer
 
@@ -27,7 +28,7 @@ from bigdata.kafka_sender.faker import Faker
 
 class Sender(KafkaProducer):
 
-    batch_records_num = 10000
+    batch_records_num = 100
 
     def __init__(self, bootstrap_servers):
         super().__init__(
@@ -42,6 +43,7 @@ class Sender(KafkaProducer):
                 self.send(topic, self.faker.gen_one_student())
             self.flush()
             print(f'send {self.batch_records_num} records to {topic} success')
+            time.sleep(10)
 
 
 if __name__ == '__main__':
