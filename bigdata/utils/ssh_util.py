@@ -25,7 +25,7 @@ class SSHConnection:
     @property
     def other_connections(self):
         if not self._other_connections:
-            self._connections = SerialGroup(*self.hosts[1:], user='root', connect_kwargs={'password': ' '})
+            self._other_connections = SerialGroup(*self.hosts[1:], user='root', connect_kwargs={'password': ' '})
         return self._other_connections
 
     def run_cmd_local(self, cmd):
