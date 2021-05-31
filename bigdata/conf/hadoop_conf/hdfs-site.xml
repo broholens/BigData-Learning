@@ -1,0 +1,18 @@
+<configuration>
+    <property>
+        <name>dfs.namenode.secondary.http-address</name>
+        <value>z:50090</value>
+    </property>
+    <property>
+        <name>dfs.replication</name>
+        <value>3</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/opt/bigdata/hadoop-3.3.0/tmp/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/opt/bigdata/hadoop-3.3.0/tmp/dfs/data</value>
+    </property>
+</configuration>
