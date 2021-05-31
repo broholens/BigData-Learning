@@ -44,17 +44,21 @@ class Installer:
         for host in load_hosts_with_name():
             self.ssh.run_cmd_all_nodes(f'echo "{host}" >> /etc/hosts')
 
-    def install_hadoop(self):
+    def config_hadoop_local(self):
+        hadoop_etc_home = f'{self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/'
         hostnames = "\n".join(load_hostname())
-        self.ssh.run_cmd_local(f'echo "{hostnames}" > {self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/workers')
-        core_site_conf = read_hadoop_conf('core-site.xml')
-        self.ssh.run_cmd_local(f'echo "{core_site_conf}" > {self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/core-site.xml')
-        core_site_conf = read_hadoop_conf('hdfs-site.xml')
-        self.ssh.run_cmd_local(f'echo "{core_site_conf}" > {self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/hdfs-site.xml')
-        core_site_conf = read_hadoop_conf('mapred-site.xml')
-        self.ssh.run_cmd_local(f'echo "{core_site_conf}" > {self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/mapred-site.xml')
-        core_site_conf = read_hadoop_conf('yarn-site.xml')
-        self.ssh.run_cmd_local(f'echo "{core_site_conf}" > {self.home_path}/hadoop-{self.hadoop_version}/etc/hadoop/yarn-site.xml')
+        self.ssh.run_cmd_local(f'echo "{hostnames}" > {hadoop_etc_home}workers')
+
+        conf = read_hadoop_conf('hdfs-env.sh')
+        self.ssh.run_cmd_local(f'echo "{conf}" > {hadoop_etc_home}hdfs-env.sh')
+        conf = read_hadoop_conf('core-site.xml')
+        self.ssh.run_cmd_local(f'echo "{conf}" > {hadoop_etc_home}core-site.xml')
+        conf = read_hadoop_conf('hdfs-site.xml')
+        self.ssh.run_cmd_local(f'echo "{conf}" > {hadoop_etc_home}hdfs-site.xml')
+        conf = read_hadoop_conf('mapred-site.xml')
+        self.ssh.run_cmd_local(f'echo "{conf}" > {hadoop_etc_home}mapred-site.xml')
+        conf = read_hadoop_conf('yarn-site.xml')
+        self.ssh.run_cmd_local(f'echo "{conf}" > {hadoop_etc_home}yarn-site.xml')
 
     def install_hadoop_on_other_nodes(self):
         zip_file = f'hadoop-{self.hadoop_version}.zip'
@@ -64,13 +68,15 @@ class Installer:
         self.ssh.run_cmd_other_nodes(f'cd {self.home_path}; unzip {zip_file}')
         self.ssh.run_cmd_all_nodes(f'cd {self.home_path}; rm -f {zip_file}')
 
-    def config_hadoop(self):
+    def config_hadoop_path(self):
         # http://dblab.xmu.edu.cn/blog/2775-2/#:~:text=Hadoop%20%E9%9B%86%E7%BE%A4%E7%9A%84%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E5%A4%A7%E8%87%B4%E5%8C%85%E6%8B%AC%E4%BB%A5%E4%B8%8B%E6%AD%A5%E9%AA%A4%EF%BC%9A%20%EF%BC%881%EF%BC%89%E6%AD%A5%E9%AA%A41%EF%BC%9A%E9%80%89%E5%AE%9A%E4%B8%80%E5%8F%B0%E6%9C%BA%E5%99%A8%E4%BD%9C%E4%B8%BA,Master%EF%BC%9B%20%EF%BC%882%EF%BC%89%E6%AD%A5%E9%AA%A42%EF%BC%9A%E5%9C%A8Master%E8%8A%82%E7%82%B9%E4%B8%8A%E5%88%9B%E5%BB%BAhadoop%E7%94%A8%E6%88%B7%E3%80%81%E5%AE%89%E8%A3%85SSH%E6%9C%8D%E5%8A%A1%E7%AB%AF%E3%80%81%E5%AE%89%E8%A3%85Java%E7%8E%AF%E5%A2%83%EF%BC%9B%20%EF%BC%883%EF%BC%89%E6%AD%A5%E9%AA%A43%EF%BC%9A%E5%9C%A8Master%E8%8A%82%E7%82%B9%E4%B8%8A%E5%AE%89%E8%A3%85Hadoop%EF%BC%8C%E5%B9%B6%E5%AE%8C%E6%88%90%E9%85%8D%E7%BD%AE%EF%BC%9B
         self.ssh.run_cmd_all_nodes(f'echo "export HADOOP_HOME={self.home_path}/hadoop-{self.hadoop_version}" >> /root/.bashrc')
         # `"` will make error
         self.ssh.run_cmd_all_nodes(f'echo \'export PATH=$HADOOP_HOME/bin:$PATH\' >> /root/.bashrc')
         self.ssh.run_cmd_all_nodes(f'echo \'export PATH=$HADOOP_HOME/sbin:$PATH\' >> /root/.bashrc')
         self.ssh.run_cmd_all_nodes('source /root/.bashrc')
+        # format namenode
+        self.ssh.run_cmd_local('hdfs namenode -format')
 
     # def install_spark(self):
     #     self.ssh.run_cmd_all_nodes(f'echo "export SPARK_HOME={self.home_path}/spark-{self.spark_version}" >> /root/.bashrc')
@@ -83,6 +89,6 @@ if __name__ == '__main__':
     # installer.make_home_path()
     # installer.config_hosts()
     # installer.download_components()
-    # installer.install_hadoop()
-    # installer.install_hadoop_on_other_nodes()
-    installer.config_hadoop()
+    installer.config_hadoop_local()
+    installer.install_hadoop_on_other_nodes()
+    # installer.config_hadoop_path()

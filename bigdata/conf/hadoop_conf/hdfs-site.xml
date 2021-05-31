@@ -8,6 +8,16 @@
         <value>3</value>
     </property>
     <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.env-whitelist</name>
+        <value>
+            JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME
+        </value>
+    </property>
+    <property>
         <name>dfs.namenode.name.dir</name>
         <value>file:/opt/bigdata/hadoop-3.3.0/tmp/dfs/name</value>
     </property>
